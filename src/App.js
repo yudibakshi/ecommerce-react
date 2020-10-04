@@ -1,23 +1,46 @@
-import React from 'react';
-import { Switch, Route } from 'react-router-dom'
+import React, { Component } from 'react';
+import { Route, Switch } from 'react-router-dom'
 
 import Header from './components/header/header';
 import HomePage from './pages/homepage/homepage';
 import ShopPage from './pages/shop/shop';
+import SignInPage from './pages/sign-in-page/sign-in-page';
 
-// import HatsPage from './pages/hatspage/hatspage';
+import { auth } from "./utils/firebase";
+
 import './App.css';
 
-function App() {
-  return (
-    <React.Fragment>
-			<Header />
-			<Switch>
-				<Route exact path="/" component={HomePage} />
-				<Route path="/shop" component={ShopPage} />
-			</Switch>
-		</React.Fragment>
-	);
+class App extends Component {
+	state = {
+		currentUser:  null
+	}
+
+	unSubscribeFromAuth = null;
+
+	componentDidMount() {
+		this.unSubscribeFromAuth = auth.onAuthStateChanged(user => {
+			this.setState({ currentUser : user });
+			console.log(user);
+		})
+	}
+
+	componentWillUnmount() {
+		this.unSubscribeFromAuth();
+	}
+	
+
+	render() {
+		return (
+			<React.Fragment>
+				<Header currentUser={this.state.currentUser}/>
+				<Switch>
+					<Route exact path="/" component={HomePage} />
+					<Route exact path="/shop" component={ShopPage} />
+					<Route exact path="/signin" component={SignInPage} />
+				</Switch>
+			</React.Fragment>
+		);
+	}
 }
 
 export default App;
