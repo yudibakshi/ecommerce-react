@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import CustomButton from '../common/custom-button/custom-button';
 import FormInput from '../common/form-input/form-input';
 
-import { signInWithGoogle } from '../../utils/firebase.js'
+import { auth, signInWithGoogle } from '../../utils/firebase.js'
 
 import './sign-in.scss'
 
@@ -12,9 +12,16 @@ class SignIn extends Component {
 		password: ''
 	}
 
-	handleSubmit = (event) => {
+	handleSubmit = async (event) => {
 		event.preventDefault();
-		this.setState({ email: '', password:'' })
+
+		const { email, password } = this.state;
+		try {
+			await auth.signInWithEmailAndPassword(email, password);
+			this.setState({ email: '', password:'' })
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	handleChange = (event) => {
@@ -68,3 +75,7 @@ class SignIn extends Component {
 }
  
 export default SignIn;
+
+/**TODO
+ * firestore users collection in sync with firestore authentication ?
+ */
